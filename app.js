@@ -9,6 +9,8 @@ const port = process.env.PORT || 3000;
 // routes
 const user = require("./routes/user");
 const donation = require("./routes/donation");
+const charity = require("./routes/charity");
+const project = require("./routes/project");
 // models
 
 const corsOptions = {
@@ -22,8 +24,10 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use("/api/", user);
-app.use("/api/", donation);
+app.use("/api/users", user);
+app.use("/api/donations", donation);
+app.use("/api/charities", charity);
+app.use("/api/projects", project);
 
 async function testConnection() {
   try {
