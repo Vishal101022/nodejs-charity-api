@@ -1,11 +1,14 @@
-const user = require("../models/user");
+const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 exports.register = async (req, res) => {
   const { name, email, phone, password } = req.body;
   try {
     // check user exists or not
-    const userExits = await user.findOne({ where: { email } });
+    const userExits = await User.findOne({ where: { email } });
     if (userExits) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -13,14 +16,40 @@ exports.register = async (req, res) => {
     const saltRound = 10;
     const hashedPassword = await bcrypt.hash(password, saltRound);
     // create user
-    await user.create({
+    await User.create({
       name,
       email,
       phone,
       password: hashedPassword,
     });
-    res.status(201).json({ message: "User created successfully", user });
+    res.status(201).json({ message: "User created successfully"});
   } catch (err) {
     res.status(500).json({ error: error.message });
   }
+};
+
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      // check user exists or not
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+        // compare password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      // generate JWT token
+      const token = jwt.sign({ userId: user.id , name: user.name}, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+
+      // return token
+      return res.status(200).json({ message: "Login successful", token });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
 };
