@@ -45,3 +45,20 @@ exports.charityAuthMiddleware = async (req, res, next) => {
   }
 }
 
+exports.adminMiddleware = async (req, res, next) => { 
+  try {
+    const token = req.header("Authorization");
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const userExits = await User.findByPk(payload.userId);
+    if (!userExits) {
+      return res.status(401).json({ error: "User not found" });
+    }
+    if (!userExits.isAdmin) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+}
