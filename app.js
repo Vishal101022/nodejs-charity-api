@@ -8,7 +8,7 @@ const port = process.env.PORT || 3000;
 
 // routes
 const user = require("./routes/user");
-
+const donation = require("./routes/donation");
 // models
 
 const corsOptions = {
@@ -18,10 +18,12 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
+// middleware
 const app = express();
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use("/api/users", user);
+app.use("/api/", user);
+app.use("/api/", donation);
 
 async function testConnection() {
   try {
