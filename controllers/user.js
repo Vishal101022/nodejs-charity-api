@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 exports.register = async (req, res) => {
-  const { name, email, phone, password } = req.body;
+  const { name, email, phone, address, isAdmin, password } = req.body;
   try {
     // check user exists or not
     const userExits = await User.findOne({ where: { email } });
@@ -20,10 +20,12 @@ exports.register = async (req, res) => {
       name,
       email,
       phone,
+      address,
+      isAdmin,
       password: hashedPassword,
     });
     res.status(201).json({ message: "User created successfully"});
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
@@ -52,4 +54,54 @@ exports.login = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+};
+
+// get user details
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id
+      , {
+        attributes: ["id", "name", "email", "phone", "address", "isAdmin", "createdAt"],}
+    );
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// update user details
+exports.updateUser = async (req, res) => {
+   const  { name, phone, address, isAdmin } = req.body;
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.address = address || user.address;
+    user.isAdmin = isAdmin || user.isAdmin;
+
+    await user.save();
+    res.status(200).json({ message: "User updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+// get user details with id
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
