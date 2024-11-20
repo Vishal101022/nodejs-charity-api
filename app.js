@@ -11,6 +11,7 @@ const user = require("./routes/user");
 const donation = require("./routes/donation");
 const charity = require("./routes/charity");
 const project = require("./routes/project");
+const download = require("./routes/download");
 // models
 
 const corsOptions = {
@@ -28,6 +29,7 @@ app.use("/api/users", user);
 app.use("/api/donations", donation);
 app.use("/api/charities", charity);
 app.use("/api/projects", project);
+app.use("/api/", download);
 
 async function testConnection() {
   try {
