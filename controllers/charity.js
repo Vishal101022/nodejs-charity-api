@@ -1,10 +1,12 @@
 const Charity = require("../models/charity");
-const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sequelize = require("../util/db");
+const Email = require("../services/emailService");
 
 exports.register = async (req, res) => {
-     const { name, email,location, category, password,  mission, goals } = req.body;
+  const { name, email, location, category, password, mission, goals } = req.body;
+  const t = await sequelize.transaction();
   try {
     const existingCharity = await Charity.findOne({ where: { email } });
     if (existingCharity) {
@@ -25,13 +27,20 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       mission,
       goals,
-    });
+    }
+    ,{ transaction: t });
+
+   
+    Email.sendEmail({ email: email, subject: "Charity Registration", textContent: "Charity registration is pending approval by the admin" });
     res
       .status(201)
       .json({
         message: "Charity registered successfully. Pending admin approval.",
       });
+
+    await t.commit();
   } catch (error) {
+    await t.rollback();
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -72,7 +81,7 @@ exports.approveCharity = async (req, res) => {
 
     charity.isApproved = true;
     await charity.save();
-
+    Email.sendEmail({ email: charity.email, subject: "Charity Approval", textContent: "Charity has been approved by the admin. Now You can start your Project Campaign!" });
     res.status(200).json({ message: "Charity approved successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -87,7 +96,7 @@ exports.rejectCharity = async (req, res) => {
   
       charity.isApproved = false;
       await charity.save();
-  
+      Email.sendEmail({ email: charity.email, subject: "Charity Rejection", textContent: "Charity has been rejected by the admin, Pease contact the administrator" });
       res.status(200).json({ message: "Charity rejected successfully" });
     } catch (error) {
       res.status(500).json({ message: "Server error", error: error.message });
