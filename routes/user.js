@@ -7,6 +7,6 @@ router.post("/register", user.register);
 router.post("/login", user.login);
 router.get("/profile", auth.authMiddleware, user.getUser);
 router.get("/profile/:id", auth.authMiddleware, user.getUserById);
-router.patch("/user", auth.authMiddleware, user.updateUser);
+router.patch("/profile", auth.authMiddleware, user.updateUser);
 
 module.exports = router;
