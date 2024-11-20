@@ -102,3 +102,25 @@ exports.getDonation = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+exports.getDonationHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const donations = await Donation.findAll({
+      where: { userId },
+      attributes: ["order_id", "amount", "status", "createdAt"],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: Project,
+          attributes: ["title", "description"],
+        },
+      ],
+    });
+
+    res.status(200).json({ userId, donations });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
