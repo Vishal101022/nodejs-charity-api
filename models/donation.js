@@ -1,6 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 const user = require("./user");
+const project = require("./project");
+
 
 
 const Donation = sequelize.define(
@@ -42,5 +44,8 @@ const Donation = sequelize.define(
 
 user.hasMany(Donation, { foreignKey: "userId", onDelete: "CASCADE" });
 Donation.belongsTo(user, { foreignKey: "userId", onDelete: "CASCADE" });
+
+project.hasMany(Donation, { foreignKey: "projectId", onDelete: "CASCADE" });
+Donation.belongsTo(project, { foreignKey: "projectId", onDelete: "CASCADE" });
 
 module.exports = Donation;
