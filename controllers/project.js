@@ -2,7 +2,7 @@ const Project = require("../models/project");
 
 exports.createProject = async (req, res) => {
     const { title, description, donationGoal } = req.body;
-    const charityId = req.user.id;
+    const charityId = req.charity.id;
     try {
         const project = await Project.create({
             title,
@@ -18,7 +18,9 @@ exports.createProject = async (req, res) => {
 
 exports.getAllProjects = async (req, res) => {
     try {
-        const projects = await Project.findAll();
+        const projects = await Project.findAll(
+            { attributes: ["id", "title", "description", "donationGoal", "charityId"] }
+        );
         res.status(200).json({ projects });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -28,7 +30,9 @@ exports.getAllProjects = async (req, res) => {
 exports.getProjectById = async (req, res) => {
     const projectId = req.params.id;
     try {
-        const project = await Project.findByPk(projectId);
+        const project = await Project.findByPk(projectId,
+            { attributes: ["id", "title", "description", "donationGoal", "charityId"] }
+        );
         if (!project) {
             return res.status(404).json({ error: "Project not found" });
         }
