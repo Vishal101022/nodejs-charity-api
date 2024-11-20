@@ -8,6 +8,10 @@ const Charity = sequelize.define("charity", {
     allowNull: false,
     primaryKey: true,
   },
+  isApproved: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -18,7 +22,11 @@ const Charity = sequelize.define("charity", {
     allowNull: false,
     unique: true,
   },
-  password: {
+  location: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  category: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -28,9 +36,9 @@ const Charity = sequelize.define("charity", {
   goals: {
     type: DataTypes.TEXT,
   },
-  isApproved: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 });
 
