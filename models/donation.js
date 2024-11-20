@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../util/db");
 const user = require("./user");
 
+
 const Donation = sequelize.define(
   "donation",
   {
@@ -11,20 +12,25 @@ const Donation = sequelize.define(
       allowNull: false,
       primaryKey: true,
     },
-    amount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    charityName: {
+    order_id: {
       type: DataTypes.STRING,
+    },
+    amount: {
+      type: DataTypes.FLOAT,
+    },
+    status: {
+      type: DataTypes.STRING,
+    },
+    payment_id: {
+      type: DataTypes.STRING,
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      onDelete: "CASCADE",
       allowNull: false,
     },
     userId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: user,
-        key: "id",
-      },
       onDelete: "CASCADE",
       allowNull: false,
     },
