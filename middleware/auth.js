@@ -31,13 +31,13 @@ exports.charityAuthMiddleware = async (req, res, next) => {
   try {
     const token = req.header("Authorization");
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const userExits = await Charity.findByPk(payload.userId);
-    if (!userExits) {
+    const charity = await Charity.findByPk(payload.charityId);
+    if (!charity) {
       return res.status(401).json({ error: "Charity not found" });
     }
     req.charity = {
-      id: userExits.id,
-      name: userExits.name
+      id: charity.id,
+      name: charity.name
     }
     next();
   } catch (error) {
