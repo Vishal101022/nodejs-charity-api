@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
-     const { name, email, password, mission, goals } = req.body;
+     const { name, email,location, category, password,  mission, goals } = req.body;
   try {
     const existingCharity = await Charity.findOne({ where: { email } });
     if (existingCharity) {
@@ -20,6 +20,8 @@ exports.register = async (req, res) => {
     await Charity.create({
       name,
       email,
+      location,
+      category,
       password: hashedPassword,
       mission,
       goals,
@@ -80,12 +82,31 @@ exports.approveCharity = async (req, res) => {
 
 exports.getCharity = async (req, res) => {
   try {
-    const charities = await Charity.findAll(
-      {attributes: ["id", "name", "email", "mission", "goals", "isApproved", "createdAt"]},
-    );
-    res.status(200).json({ charities });
+    const { category, location, search, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const where = {};
+    if (category) where.category = category;
+    if (location) where.location = location;
+    if (search) where.name = { [Op.like]: `%${search}%` };
+
+    const charities = await Charity.findAndCountAll({
+      where,
+      offset,
+      limit: parseInt(limit),
+    });
+
+    res.status(200).json({
+      charities: charities.rows,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(charities.count / limit),
+      },
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching charities", error: error.message });
   }
 };
 
@@ -93,7 +114,7 @@ exports.getCharity = async (req, res) => {
 exports.getCharityById = async (req, res) => {
     try {
       const charity = await Charity.findByPk(req.params.id
-          ,{attributes: ["id", "name", "email", "mission", "goals", "isApproved", "createdAt"]},
+          ,{attributes: ["id", "name", "email", "mission", "goals", "location", "category", "isApproved", "createdAt"]},
         );
         if (!charity) {
             return res.status(404).json({ error: "Charity not found" });
