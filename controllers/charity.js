@@ -79,6 +79,20 @@ exports.approveCharity = async (req, res) => {
   }
 };
 
+exports.rejectCharity = async (req, res) => {
+    const charityId = req.params.id;
+    try {
+      const charity = await Charity.findByPk(charityId);
+      if (!charity) return res.status(404).json({ message: "Charity not found" });
+  
+      charity.isApproved = false;
+      await charity.save();
+  
+      res.status(200).json({ message: "Charity rejected successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
 
 exports.getCharity = async (req, res) => {
   try {
