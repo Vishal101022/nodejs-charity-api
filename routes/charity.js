@@ -6,8 +6,8 @@ const auth = require("../middleware/auth");
 router.post("/register", charity.register);
 router.post("/approve/:id", auth.adminMiddleware, charity.approveCharity);
 router.post("/login", charity.login);
-router.get("/charity", auth.adminMiddleware, charity.getCharity);
-router.get("/charity/:id", auth.adminMiddleware, charity.getCharityById);
+router.get("/charity", charity.getCharity);
+router.get("/charity/:id", charity.getCharityById);
 router.patch("/charity", auth.charityAuthMiddleware, charity.updateCharity);
 
 
