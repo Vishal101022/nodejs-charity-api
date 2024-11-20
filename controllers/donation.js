@@ -3,6 +3,9 @@ const Razorpay = require("razorpay");
 const Project = require("../models/project");
 const sequelize = require("../util/db");
 const dotenv = require("dotenv");
+const Email = require("../services/emailService");
+
+
 const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
@@ -79,6 +82,13 @@ exports.updateTransaction = async (req, res) => {
     });
     currDonation.currentDonations += order.amount;
     await currDonation.save();
+    
+    // send email to the user
+    const user = await user.findOne({
+      where: { id: order.userId },
+    });
+    Email.sendEmail({ email: user.email, subject: "Donation Successfull", textContent: "Your Donation has been received successfully. Thank you for your support!" });
+
     res.status(200).json({ status: "success" });
   } catch (error) {
     console.log(error);
