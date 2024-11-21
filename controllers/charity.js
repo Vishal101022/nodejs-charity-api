@@ -115,6 +115,7 @@ exports.getCharity = async (req, res) => {
 
     const charities = await Charity.findAndCountAll({
       where,
+      attributes: ["id", "name", "email", "mission", "goals", "location", "category", "isApproved", "createdAt"],
       offset,
       limit: parseInt(limit),
     });
