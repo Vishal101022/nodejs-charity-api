@@ -102,7 +102,7 @@ exports.getDonation = async (req, res) => {
 
     const donations = await Donation.findAll({
       where: { userId },
-      attributes: ["id", "amount", "charityName", "createdAt"],
+      attributes: ["id","order_id" ,"amount", "status", "createdAt"],
 
       order: [["createdAt", "DESC"]],
     });
